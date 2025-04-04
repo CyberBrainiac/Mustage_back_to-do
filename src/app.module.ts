@@ -1,40 +1,13 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CatsModule } from './cats/cats.module';
 import { ConfigModule } from '@nestjs/config';
-import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { LoggerMiddleware } from './middlewares/logger.middleware';
-import { CatsController } from './cats/cats.controller';
-import { AuthModule } from './auth/auth.module';
-import { EncryptModule } from './encrypt/encrypt.module';
-import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from './guards/auth.guard';
+import { ApiModule } from './api/api.module';
+import { AppService } from './app.service';
 
 @Module({
-  imports: [
-    CatsModule,
-    ConfigModule.forRoot({ isGlobal: true }),
-    UserModule,
-    PrismaModule,
-    AuthModule,
-    EncryptModule,
-  ],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, ApiModule],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-  ],
+  providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      // .forRoutes({ path: 'cats', method: RequestMethod.GET });
-      .forRoutes(CatsController);
-  }
-}
+export class AppModule {}
